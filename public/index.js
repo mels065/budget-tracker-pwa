@@ -151,3 +151,9 @@ document.querySelector("#add-btn").onclick = function() {
 document.querySelector("#sub-btn").onclick = function() {
   sendTransaction(false);
 };
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(res => console.log("Service worker registered successfully", res))
+    .catch(err => console.log("Failed to register service worker:", err));
+}
