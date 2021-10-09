@@ -1,0 +1,21 @@
+{
+    "short_name": "BudgetTrackerPWA",
+    "name": "Budget Tracker PWA",
+    "description": "A progressive web application for keeping track of budget",
+    "icons": [
+        {
+            "src": "icons/icon-192x192.png",
+            "type": "image/png",
+            "sizes": "192x169"
+        },
+        {
+            "src": "icons/icon-512x512.png",
+            "type": "image/png",
+            "sizes": "512x452"
+        }
+    ],
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#eee",
+    "theme_color": "#000"
+}
