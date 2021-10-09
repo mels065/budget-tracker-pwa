@@ -6,7 +6,9 @@ const STATIC_CACHE_ASSETS = [
     'index.js',
     'styles.css',
     'icons/icon-192x192.png',
-    'icons/icon-512x512.png'
+    'icons/icon-512x512.png',
+    'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
+    'https://cdn.jsdelivr.net/npm/chart.js@2.8.0'
 ];
 
 self.addEventListener('install', evt => {
@@ -42,10 +44,7 @@ self.addEventListener('activate', evt => {
 });
 
 self.addEventListener("fetch", evt => {
-    if (
-        evt.request.method !== "GET" ||
-        !evt.request.url.startsWith(self.location.origin)
-    ) {
+    if (evt.request.method !== "GET") {
         evt.respondWith(fetch(evt.request));
         return;
     }
@@ -62,6 +61,7 @@ self.addEventListener("fetch", evt => {
                     .catch(() => caches.match(evt.request));
             })
         );
+        return;
     }
 
     evt.respondWith(
@@ -76,7 +76,7 @@ self.addEventListener("fetch", evt => {
                 return caches.open(RUNTIME_CACHE_NAME)
                     .then(cache =>
                         fetch(evt.request).then(response =>
-                            cache.put(evt.request, response.clone).then(() =>
+                            cache.put(evt.request, response.clone()).then(() =>
                                 response
                             )
                         )
