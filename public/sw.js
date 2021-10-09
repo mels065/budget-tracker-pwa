@@ -40,3 +40,47 @@ self.addEventListener('activate', evt => {
             .catch(err => console.log("Something went wrong with activating the service worker:", err))
     );
 });
+
+self.addEventListener("fetch", evt => {
+    if (
+        evt.request.method !== "GET" ||
+        !evt.request.url.startsWith(self.location.origin)
+    ) {
+        evt.respondWith(fetch(evt.request));
+        return;
+    }
+
+    if (evt.request.url.includes('/api/transaction')) {
+        evt.respondWith(
+            caches.open(RUNTIME_CACHE_NAME).then(cache => {
+                return fetch(evt.request)
+                    .then(response => {
+                        cache.put(evt.request, response.clone());
+                        return response;
+                    })
+                    // Offline behavior
+                    .catch(() => caches.match(evt.request));
+            })
+        );
+    }
+
+    evt.respondWith(
+        caches.match(evt.request)
+            .then(cachedResponse => {
+                if (cachedResponse) {
+                    return cachedResponse
+                }
+
+
+
+                return caches.open(RUNTIME_CACHE_NAME)
+                    .then(cache =>
+                        fetch(evt.request).then(response =>
+                            cache.put(evt.request, response.clone).then(() =>
+                                response
+                            )
+                        )
+                    );
+            })
+    );
+});
