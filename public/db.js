@@ -20,10 +20,49 @@ request.onsuccess = event => {
 }
 
 const saveRecord = transaction => {
-    console.log('Saved transaction');
     const transactionObjectStore = db.transaction(
         ["transactions"],
         "readwrite"
     ).objectStore("transactions");
     transactionObjectStore.add(transaction);
+    console.log('Saved transaction');
 }
+
+const pushRecords = () => {
+    let offlineTransactions = [];
+    let transactionsObjectStore = db.transaction(
+        ["transactions"],
+        "readwrite"
+    ).objectStore("transactions");
+    transactionsObjectStore.openCursor().onsuccess = evt => {
+        const cursor = evt.target.result;
+        if (cursor) {
+            offlineTransactions.push(cursor.value);
+            cursor.continue();
+        } else {
+            fetch(
+                '/api/transaction/bulk',
+                {
+                    method: 'POST',
+                    body: JSON.stringify(offlineTransactions),
+                    headers: {
+                    Accept: "application/json, text/plain, */*",
+                    "Content-Type": "application/json"
+                    }
+                }
+            ).then(() => {
+                transactionsObjectStore = db.transaction(
+                    ["transactions"],
+                    "readwrite"
+                ).objectStore("transactions");
+                console.log(transactionsObjectStore);
+                transactionsObjectStore.clear();
+                console.log("Pushed offline transactions to server");
+            }).catch(err => console.log("Could not push transactions", err));
+        }
+    }
+}
+
+window.addEventListener('online', () => {
+    pushRecords();
+});
