@@ -1,22 +1,29 @@
 const DB_NAME = 'Budget Tracker';
+const DB_VERSION = 1;
 
 let db;
-let transactionRequestObjectStore;
+let objectStore;
 
-const request = window.indexedDB.open(DB_NAME, 1);
+const request = window.indexedDB.open(DB_NAME, DB_VERSION);
 
 request.onerror = err => console.log("Something went wrong with IndexedDB:", err);
 
 request.onupgradeneeded = event => {
     db = event.target.result;
 
-    const objectStore = db.createObjectStore('transactionRequests', { keyPath: "id", autoIncrement: true });
-    objectStore.createIndex('timestamp', 'timestamp', { unique: false });
+    objectStore = db.createObjectStore('transactions', { keyPath: "id", autoIncrement: true });
+}
 
-    objectStore.transaction.oncomplete = event => {
-        transactionRequestObjectStore = db.transaction(
-            "transactionRequests",
-            "readwrite"
-        ).objectStore("transactionRequests");
-    }
+request.onsuccess = event => {
+    console.log("Database sucessfully connected");
+    db = event.target.result;
+}
+
+const saveRecord = transaction => {
+    console.log('Saved transaction');
+    const transactionObjectStore = db.transaction(
+        ["transactions"],
+        "readwrite"
+    ).objectStore("transactions");
+    transactionObjectStore.add(transaction);
 }
