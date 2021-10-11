@@ -13,6 +13,8 @@
 
 A progressive web application for tracking a budget.
 
+![image](https://user-images.githubusercontent.com/6201053/136804272-866ec100-15a4-4735-aa3b-7f20e99c4380.png)
+
 ## Installation
 
 `git clone https://github.com/mels065/budget-tracker-pwa.git`
